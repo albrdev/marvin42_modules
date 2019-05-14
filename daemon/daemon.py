@@ -29,7 +29,7 @@ class Daemon(object):
         """ There shined a shiny daemon, In the middle, Of the road... """
         # fork 1 to spin off the child that will spawn the deamon.
         if os.fork() != 0:
-            sys.exit()
+            os._exit(0)
 
         # This is the child.
         # 1. cd to root for a guarenteed working dir.
@@ -38,8 +38,8 @@ class Daemon(object):
         os.setsid()
 
         # fork 2 ensures we can't get a controlling ttd.
-        if os.fork():
-            sys.exit()
+        if os.fork() != 0:
+            os._exit(0)
             
         passwd = pwd.getpwnam(self.__username)
         if passwd.pw_gid != os.getgid():

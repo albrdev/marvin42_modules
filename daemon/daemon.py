@@ -47,6 +47,7 @@ class Daemon(object):
 
         if passwd.pw_uid != os.getuid():
             os.setuid(passwd.pw_uid)
+            print("passwd:", passwd.pw_dir)
             os.putenv("HOME", passwd.pw_dir)
 
         os.chdir(passwd.pw_dir)

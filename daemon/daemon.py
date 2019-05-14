@@ -68,7 +68,7 @@ class Daemon(object):
         # Exceptions raised after this point will be written to the log file.
         sys.stderr.flush()
         #with open(self.__stderr, 'a+', 0) as stderr:
-        with open(self.__stderr, 'w+') as stderr:
+        with open(self.__stderr, 'a+') as stderr:
             os.dup2(stderr.fileno(), sys.stderr.fileno())
 
         # stdout
@@ -77,7 +77,7 @@ class Daemon(object):
         # instead.
         sys.stdout.flush()
         #with open(self.__stdout, 'a+', 0) as stdout:
-        with open(self.__stdout, 'w+') as stdout:
+        with open(self.__stdout, 'a+') as stdout:
             os.dup2(stdout.fileno(), sys.stdout.fileno())
 
         # Write pid file

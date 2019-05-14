@@ -23,13 +23,12 @@ class Daemon(object):
         self.__pid_file = pid_file
 
     def __del__(self):
-        print('destruct1')
+        pass
 
     def init(self):
         """ There shined a shiny daemon, In the middle, Of the road... """
         # fork 1 to spin off the child that will spawn the deamon.
         if os.fork() != 0:
-            print("Exiting", os.getpid())
             os._exit(0)
 
         # This is the child.
@@ -40,7 +39,6 @@ class Daemon(object):
 
         # fork 2 ensures we can't get a controlling ttd.
         if os.fork() != 0:
-            print("Exiting", os.getpid())
             os._exit(0)
             
         passwd = pwd.getpwnam(self.__username)

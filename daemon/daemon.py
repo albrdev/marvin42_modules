@@ -42,16 +42,12 @@ class Daemon(object):
             os._exit(0)
             
         passwd = pwd.getpwnam(self.__username)
-        #if passwd.pw_gid != os.getgid():
-        #    os.setgid(passwd.pw_gid)
+        if passwd.pw_gid != os.getgid():
+            os.setgid(passwd.pw_gid)
 
-        #if passwd.pw_uid != os.getuid():
-        #    os.setuid(passwd.pw_uid)
-        #    os.putenv("HOME", passwd.pw_dir)
-
-        os.setresgid(passwd.pw_gid, passwd.pw_gid, passwd.pw_gid)
-        os.setresuid(passwd.pw_uid, passwd.pw_gid, passwd.pw_gid)
-        os.putenv("HOME", passwd.pw_dir)
+        if passwd.pw_uid != os.getuid():
+            os.setuid(passwd.pw_uid)
+            os.putenv("HOME", passwd.pw_dir)
 
         os.chdir(passwd.pw_dir)
         os.umask(0o022)

@@ -41,7 +41,7 @@ class Daemon(object):
         if os.fork() != 0:
             os._exit(0)
             
-        #passwd = pwd.getpwnam(self.__username)
+        passwd = pwd.getpwnam(self.__username)
         #if passwd.pw_gid != os.getgid():
         #    os.setgid(passwd.pw_gid)
 

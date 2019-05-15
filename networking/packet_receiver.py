@@ -22,6 +22,8 @@ class PacketReceiver(object):
         self.__socket.listen(max_connections)
 
     def __del__(self):
+        self.on_server_disconnect()
+
         for s in reversed(self.__sockets_read):
             self.__close_socket(s)
 
@@ -31,6 +33,15 @@ class PacketReceiver(object):
         buffer = array.array('i', [0])
         fcntl.ioctl(fd, termios.FIONREAD, buffer)
         return buffer[0]
+
+    def on_client_connected(self, host: tuple):
+        pass
+
+    def on_client_disconnected(self, host: tuple):
+        pass
+
+    def on_server_disconnect(self):
+        pass
 
     def __close_socket(self, s: socket.socket):
         if s in self.__sockets_write:
@@ -44,10 +55,11 @@ class PacketReceiver(object):
 
     def __read_socket(self, s: socket.socket):
         if s is self.__socket:
-            connection, client_address = s.accept()
+            connection, addr = s.accept()
             connection.setblocking(0)
             self.__sockets_read.append(connection)
             self.__response_queues[connection] = queue.Queue()
+            self.on_client_connected(addr)
 
         else:
             header = self.__header_buffer.get(s.getpeername(), None)
@@ -56,6 +68,7 @@ class PacketReceiver(object):
             avail = self._available_bytes(s.fileno())
             if avail < n:
                 if avail <= 0:
+                    self.on_client_disconnected(s.getpeername())
                     self.__close_socket(s)
 
                 return

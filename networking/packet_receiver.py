@@ -66,7 +66,6 @@ class PacketReceiver(object):
             n = header.size if header is not None else PacketHeader.SIZE
 
             avail = self._available_bytes(s.fileno())
-            print("debug(avail={0}, n={1})".format(avail, n))
             if avail < n:
                 if avail <= 0:
                     self.on_client_disconnected(s.getpeername())

@@ -4,8 +4,9 @@ import struct
 from modules.networking import PacketID
 
 class CommandID(IntEnum):
-    MOTORSPEED      = 2
-    MOTORSETTINGS   = 3
+    MOTORSETTINGS   = 2
+    MOTORSPEED      = 3
+    MOTORSTOP       = 4
 
 PacketMotorSpeed = namedtuple('PacketMotorSpeed', ['speed_left', 'speed_right'])
 PacketMotorSpeed.FORMAT = '!ii'

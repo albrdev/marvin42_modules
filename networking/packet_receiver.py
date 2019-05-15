@@ -81,10 +81,11 @@ class PacketReceiver(object):
                 self.__header_buffer[s.getpeername()] = PacketHeader._make(struct.unpack(PacketHeader.FORMAT, data))
             else:
                 if self.on_data_received(header, data):
-                    self.__response_queues[s].put(struct.pack(PacketHeader.FORMAT, int(PacketID.TRUE), 0))
+                    response = struct.pack(PacketHeader.FORMAT, int(PacketID.TRUE), 0)
                 else:
-                    self.__response_queues[s].put(struct.pack(PacketHeader.FORMAT, int(PacketID.FALSE), 0))
+                    response = struct.pack(PacketHeader.FORMAT, int(PacketID.FALSE), 0)
 
+                self.__response_queues[s].put(response)
                 if s not in self.__sockets_write:
                     self.__sockets_write.append(s)
 

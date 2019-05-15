@@ -60,6 +60,18 @@ class PacketReceiver(object):
 
                 return
 
+            if n <= 0 and header is not None:
+                if self.on_data_received(header, None):
+                    self.__response_queues[s].put(struct.pack(PacketHeader.FORMAT, int(PacketID.TRUE), 0))
+                else:
+                    self.__response_queues[s].put(struct.pack(PacketHeader.FORMAT, int(PacketID.FALSE), 0))
+
+                if s not in self.__sockets_write:
+                    self.__sockets_write.append(s)
+
+                del self.__header_buffer[s.getpeername()]
+                return
+
             data = s.recv(n)
             if data:
                 if header is None:

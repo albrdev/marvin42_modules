@@ -53,7 +53,7 @@ class PacketReceiver(object):
         self.__sockets_read.remove(s)
         s.close()
 
-    def __read_socket(self, s: socket.socket):
+    def __read_socket(self, s: socket.socket):  
         if s is self.__socket:
             connection, addr = s.accept()
             connection.setblocking(0)
@@ -64,8 +64,10 @@ class PacketReceiver(object):
         else:
             header = self.__header_buffer.get(s.getpeername(), None)
             n = header.size if header is not None else PacketHeader.SIZE
+            print("bla1: {0}".format(header != None))
 
             avail = self._available_bytes(s.fileno())
+            print("bla2: n={0}, avail={1}".format(n, avail))
             if avail < n:
                 if avail <= 0:
                     self.on_client_disconnected(s.getpeername())
@@ -73,8 +75,9 @@ class PacketReceiver(object):
 
                 return
 
+            print("bla3")
             data = s.recv(n) if n > 0 else None
-            if header is None:
+            if header is None and n > 0:
                 if data is None:
                     return
 

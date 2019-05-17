@@ -9,9 +9,9 @@ class CommandID(IntEnum):
     MOTORSTOP       = 4
 
 PacketMotorSpeed = namedtuple('PacketMotorSpeed', ['speed_left', 'speed_right'])
-PacketMotorSpeed.FORMAT = '!ii'
+PacketMotorSpeed.FORMAT = '!bb'
 PacketMotorSpeed.SIZE = struct.calcsize(PacketMotorSpeed.FORMAT)
 
 PacketMotorSettings = namedtuple('PacketMotorSettings', ['stop_distance'])
-PacketMotorSettings.FORMAT = '!i'
+PacketMotorSettings.FORMAT = '!H'
 PacketMotorSettings.SIZE = struct.calcsize(PacketMotorSettings.FORMAT)

@@ -73,7 +73,7 @@ class Daemon(object):
 
         for i in range(1, signal.NSIG):
             try:
-                signal.signal(i, self.handle_signals)
+                signal.signal(i, self.signal_handler)
             except (OSError, RuntimeError):
                 pass
 
@@ -82,7 +82,7 @@ class Daemon(object):
     def cleanup(self):
         self.del_pid()
 
-    def handle_signals(self, num, frame):
+    def signal_handler(self, num, frame):
         pass
 
     def loop(self):

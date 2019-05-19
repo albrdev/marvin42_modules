@@ -5,15 +5,15 @@
 import sys, os, time, errno, signal, atexit, argparse, configparser, pwd
 
 class Daemon(object):
-    __slots__ = ['__stdin_file', '__stderr_file', '__stdout_file', '__username', '__pid_file']
+    __slots__ = ['__stdin_file', '__stderr_file', '__stdout_file', '__stderr_filepath', '__stdout_filepath', '__username', '__pid_file']
 
     def __init__(self, username, pid_file, stdout_filepath="/var/log/daemon.log", stderr_filepath="/var/log/daemon.log"):
         self.__stdin_file = None
         self.__stderr_file = None
         self.__stdout_file = None
 
-        self.__stdout_filepath = stdout_filepath
         self.__stderr_filepath = stderr_filepath
+        self.__stdout_filepath = stdout_filepath
         self.__username = username
         self.__pid_file = pid_file
 

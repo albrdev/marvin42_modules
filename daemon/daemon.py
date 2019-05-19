@@ -108,20 +108,28 @@ class Daemon(object):
             if err.errno == errno.ESRCH:
                 return False
             else:
-                return None
-
-        return True
+                raise
+        else:
+            return True
 
     def start(self):
         pid = self.get_pid()
         if pid:
             print ("PID file \'{0}\' exists with the PID of {1}".format(self.__pid_file, pid))
-            if self.check_pid(pid) == False:
-                print("PID {0} is not running".format(pid))
-            else:
-                print("PID {0} is currently running".format(pid))
 
-            sys.exit(1)
+            try:
+                status = self.check_pid(pid)
+            except:
+                print("Unable to terminate daemon")
+                sys.exit(1)
+            else:
+                if status:
+                    print("PID {0} is currently running".format(pid))
+                else:
+                    print("PID {0} is not running".format(pid))
+                    self.del_pid()
+
+                sys.exit(1)
 
         self.init()
         self.loop()
@@ -132,14 +140,16 @@ class Daemon(object):
             print ("PID file {0} doesn\'t exist".format(self.__pid_file))
             return
 
-        status = self.check_pid(pid)
-        if status == False:
-            print("Daemon not running")
-            self.del_pid()
-            return
-        elif status == None:
+        try:
+            status = self.check_pid(pid)
+        except:
             print("Unable to terminate daemon")
             sys.exit(1)
+        else:
+            if not status:
+                print("Daemon not running")
+                self.del_pid()
+                return
 
         try:
             while True:

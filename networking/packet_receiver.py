@@ -63,11 +63,11 @@ class PacketReceiver(object):
 
             avail = self._available_bytes(s.fileno())
             if avail < n:
-                if avail <= 0:
+                if avail <= 0: # If we have data request with no size, the client has disconnected
                     self.on_client_disconnected(s.getpeername())
                     self.__close_socket(s)
 
-                return
+                return # If size of the data is less than expected, wait for more in the next call
 
             data = s.recv(n) if n > 0 else None
             if header is None:
@@ -76,20 +76,20 @@ class PacketReceiver(object):
 
                 header = PacketHeader._make(struct.unpack(PacketHeader.FORMAT, data))
                 self.__header_buffer[s.getpeername()] = header
-                if header.size > 0:
+                if header.size > 0: # If expecting more data receive it in the next call
                     return
 
-            if header is not None:
-                if self.on_data_received(header, data):
-                    response = struct.pack(PacketHeader.FORMAT, int(PacketID.TRUE), 0)
-                else:
-                    response = struct.pack(PacketHeader.FORMAT, int(PacketID.FALSE), 0)
+            # header != None
+            if self.on_data_received(header, data):
+                response = struct.pack(PacketHeader.FORMAT, int(PacketID.TRUE), 0)
+            else:
+                response = struct.pack(PacketHeader.FORMAT, int(PacketID.FALSE), 0)
 
-                self.__response_queues[s].put(response)
-                if s not in self.__sockets_write:
-                    self.__sockets_write.append(s)
+            self.__response_queues[s].put(response)
+            if s not in self.__sockets_write:
+                self.__sockets_write.append(s)
 
-                del self.__header_buffer[s.getpeername()]
+            del self.__header_buffer[s.getpeername()]
 
     def __write_socket(self, s: socket.socket):
         try:

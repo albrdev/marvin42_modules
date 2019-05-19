@@ -75,8 +75,8 @@ class PacketReceiver(object):
                     return
 
                 header = PacketHeader._make(struct.unpack(PacketHeader.FORMAT, data))
+                self.__header_buffer[s.getpeername()] = header
                 if header.size > 0:
-                    self.__header_buffer[s.getpeername()] = header
                     return
 
             if header is not None:

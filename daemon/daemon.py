@@ -17,8 +17,8 @@ class Daemon(object):
         self.__username = username
         self.__pid_file = pid_file
 
-    def __del__(self):
-        self.cleanup()
+    #def __del__(self):
+        #self.cleanup()
 
     def init(self):
         if os.fork() != 0:

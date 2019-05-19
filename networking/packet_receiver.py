@@ -70,12 +70,16 @@ class PacketReceiver(object):
                 return
 
             data = s.recv(n) if n > 0 else None
-            if header is None and n > 0:
+            if header is None:
                 if data is None:
                     return
 
-                self.__header_buffer[s.getpeername()] = PacketHeader._make(struct.unpack(PacketHeader.FORMAT, data))
-            else:
+                header = PacketHeader._make(struct.unpack(PacketHeader.FORMAT, data))
+                if header.size > 0:
+                    self.__header_buffer[s.getpeername()] = header
+                    header = None
+
+            if header is not None:
                 if self.on_data_received(header, data):
                     response = struct.pack(PacketHeader.FORMAT, int(PacketID.TRUE), 0)
                 else:

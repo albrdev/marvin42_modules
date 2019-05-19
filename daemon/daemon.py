@@ -2,16 +2,7 @@
 #@author: albrdev
 #"""
 
-import argparse
-import configparser
-import atexit
-import errno
-import datetime
-import os
-import signal
-import sys
-import time
-import pwd
+import sys, os, time, errno, signal, atexit, argparse, configparser, pwd
 
 class Daemon(object):
     __slots__ = ['__stdout', '__stderr', '__username', '__pid_file']
@@ -28,15 +19,15 @@ class Daemon(object):
 
     def __del__(self):
         if self.stdin_file is not None:
-            close(self.stdout_file)
+            self.stdout_file.close()
 
         if self.stdin_file is not None:
-            close(self.stderr_file)
+            self.stderr_file.close()
 
         if self.stdin_file is not None:
-            close(self.stdin_file)
+            self.stdin_file.close()
 
-        sefl.cleanup()
+        self.cleanup()
 
     def init(self):
         if os.fork() != 0:

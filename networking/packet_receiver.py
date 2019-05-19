@@ -1,8 +1,4 @@
-import socket, select, array, struct, queue
-try:
-    import fcntl, termios
-except (SystemError, ImportError):
-    pass
+import socket, select, array, struct, queue, fcntl, termios
 from .packets import PacketHeader, PacketID
 
 class PacketReceiver(object):

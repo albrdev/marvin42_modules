@@ -5,27 +5,27 @@
 import sys, os, time, errno, signal, atexit, argparse, configparser, pwd
 
 class Daemon(object):
-    __slots__ = ['__stdout', '__stderr', '__username', '__pid_file']
+    __slots__ = ['__stdin_file', '__stderr_file', '__stdout_file', '__username', '__pid_file']
 
-    def __init__(self, username, pid_file, stdout='/var/log/daemon.log', stderr='/var/log/daemon.log'):
-        self.stdin_file = None
-        self.stderr_file = None
-        self.stdout_file = None
+    def __init__(self, username, pid_file, stdout_filepath="/var/log/daemon.log", stderr_filepath="/var/log/daemon.log"):
+        self.__stdin_file = None
+        self.__stderr_file = None
+        self.__stdout_file = None
 
-        self.__stdout_filepath = stdout
-        self.__stderr_filepath = stderr
+        self.__stdout_filepath = stdout_filepath
+        self.__stderr_filepath = stderr_filepath
         self.__username = username
         self.__pid_file = pid_file
 
     def __del__(self):
-        if self.stdin_file is not None:
-            self.stdout_file.close()
+        if self.__stdout_file is not None:
+            self.__stdout_file.close()
 
-        if self.stdin_file is not None:
-            self.stderr_file.close()
+        if self.__stderr_file is not None:
+            self.__stderr_file.close()
 
-        if self.stdin_file is not None:
-            self.stdin_file.close()
+        if self.__stdin_file is not None:
+            self.__stdin_file.close()
 
         self.cleanup()
 
@@ -51,16 +51,16 @@ class Daemon(object):
         os.chdir(passwd.pw_dir)
         os.umask(0o022)
 
-        self.stdin_file = open("/dev/null", 'r')
-        os.dup2(self.stdin_file.fileno(), sys.stdin.fileno())
+        self.__stdin_file = open("/dev/null", 'r')
+        os.dup2(self.__stdin_file.fileno(), sys.stdin.fileno())
 
         sys.stderr.flush()
-        self.stderr_file = open(self.__stderr_filepath, 'a+')
-        os.dup2(self.stderr_file.fileno(), sys.stderr.fileno())
+        self.__stderr_file = open(self.__stderr_filepath, 'a+')
+        os.dup2(self.__stderr_file.fileno(), sys.stderr.fileno())
 
         sys.stdout.flush()
-        self.stdout_file = open(self.__stdout_filepath, 'a+')
-        os.dup2(self.stdout_file.fileno(), sys.stdout.fileno())
+        self.__stdout_file = open(self.__stdout_filepath, 'a+')
+        os.dup2(self.__stdout_file.fileno(), sys.stdout.fileno())
 
         for i in range(1, signal.NSIG):
             try:

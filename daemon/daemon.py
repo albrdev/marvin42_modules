@@ -2,7 +2,7 @@
 #@author: albrdev
 #"""
 
-import sys, os, errno, signal, atexit, argparse, configparser, pwd
+import sys, os, time, errno, signal, atexit, argparse, configparser, pwd
 
 class Daemon(object):
     __slots__ = ['__stdin_file', '__stderr_file', '__stdout_file', '__stderr_filepath', '__stdout_filepath', '__username', '__pid_file']
@@ -18,16 +18,7 @@ class Daemon(object):
         self.__pid_file = pid_file
 
     def __del__(self):
-        if self.__stdout_file is not None:
-            self.__stdout_file.close()
-
-        if self.__stderr_file is not None:
-            self.__stderr_file.close()
-
-        if self.__stdin_file is not None:
-            self.__stdin_file.close()
-
-        self.del_pid()
+        self.cleanup()
 
     def init(self):
         if os.fork() != 0:
@@ -66,10 +57,22 @@ class Daemon(object):
             except (OSError, RuntimeError):
                 pass
 
-        atexit.register(self.del_pid)
+        atexit.register(self.cleanup)
         self.set_pid()
 
     def cleanup(self):
+        if self.__stdout_file is not None:
+            self.__stdout_file.close()
+            self.__stdout_file = None
+
+        if self.__stderr_file is not None:
+            self.__stderr_file.close()
+            self.__stderr_file = None
+
+        if self.__stdin_file is not None:
+            self.__stdin_file.close()
+            self.__stdin_file = None
+
         self.del_pid()
 
     def signal_handler(self, num, frame):
@@ -85,7 +88,7 @@ class Daemon(object):
                 pid = int(pid_file.read().strip())
             return pid
         except IOError:
-            return
+            return None
 
     def set_pid(self):
         pid = str(os.getpid())
@@ -98,9 +101,26 @@ class Daemon(object):
         except FileNotFoundError:
             pass
 
+    def check_pid(self, pid: int):
+        try:
+            os.kill(pid, 0)
+        except OSError as err:
+            if err.errno == errno.ESRCH:
+                return False
+            else:
+                return None
+
+        return True
+
     def start(self):
-        if self.get_pid():
-            print ('PID file {0} exists. Is the deamon already running?'.format(self.__pid_file))
+        pid = self.get_pid()
+        if pid:
+            print ("PID file \'{0}\' exists with the PID of {1}".format(self.__pid_file, pid))
+            if self.check_pid(pid) == False:
+                print("PID {0} is not running".format(pid))
+            else:
+                print("PID {0} is currently running".format(pid))
+
             sys.exit(1)
 
         self.init()
@@ -109,29 +129,28 @@ class Daemon(object):
     def stop(self):
         pid = self.get_pid()
         if not pid:
-            print ('PID file {0} doesn\'t exist. Is the daemon not running?'.format(self.__pid_file))
+            print ("PID file {0} doesn\'t exist".format(self.__pid_file))
             return
 
+        status = self.check_pid(pid)
+        if status == False:
+            print("Daemon not running")
+            self.del_pid()
+            return
+        elif status == None:
+            print("Unable to terminate daemon")
+            sys.exit(1)
+
         try:
-            os.kill(pid, 0)
-        except OSError:
+            while True:
+                os.kill(pid, signal.SIGTERM)
+                time.sleep(0.1)
+        except OSError as err:
             if err.errno == errno.ESRCH:
-                print("Daemon not running")
-                self.del_pid()
-                return
-            elif err.errno == errno.EPERM:
-                print("Permission denied")
+               self.del_pid()
             else:
                 print(err)
-
-            sys.exit(1)
-
-        try:
-            os.kill(pid, signal.SIGTERM)
-            self.del_pid()
-        except OSError as err:
-            print(err)
-            sys.exit(1)
+                sys.exit(1)
 
     def restart(self):
         self.stop()

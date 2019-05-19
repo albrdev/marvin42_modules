@@ -2,7 +2,7 @@
 #@author: albrdev
 #"""
 
-import sys, os, time, errno, signal, atexit, argparse, configparser, pwd
+import sys, os, errno, signal, atexit, argparse, configparser, pwd
 
 class Daemon(object):
     __slots__ = ['__stdin_file', '__stderr_file', '__stdout_file', '__stderr_filepath', '__stdout_filepath', '__username', '__pid_file']
@@ -27,7 +27,7 @@ class Daemon(object):
         if self.__stdin_file is not None:
             self.__stdin_file.close()
 
-        self.cleanup()
+        self.del_pid()
 
     def init(self):
         if os.fork() != 0:
@@ -38,8 +38,6 @@ class Daemon(object):
         if os.fork() != 0:
             os._exit(0)
 
-        #atexit.register(self.cleanup)
-            
         passwd = pwd.getpwnam(self.__username)
         if passwd.pw_gid != os.getgid():
             os.setgid(passwd.pw_gid)
@@ -68,6 +66,7 @@ class Daemon(object):
             except (OSError, RuntimeError):
                 pass
 
+        atexit.register(self.del_pid)
         self.set_pid()
 
     def cleanup(self):
@@ -136,7 +135,6 @@ class Daemon(object):
 
     def restart(self):
         self.stop()
-        time.sleep(0.5)
         self.start()
 
     def run(self):

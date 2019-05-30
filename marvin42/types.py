@@ -4,14 +4,17 @@ import struct
 from modules.networking import PacketID
 
 class CommandID(IntEnum):
+    """
+    Enum subclass for packet ID:s
+    """
     MOTORSETTINGS   = 2
     MOTORSPEED      = 3
     MOTORSTOP       = 4
 
-PacketMotorSpeed = namedtuple('PacketMotorSpeed', ['speed_left', 'speed_right'])
-PacketMotorSpeed.FORMAT = '!bb'
-PacketMotorSpeed.SIZE = struct.calcsize(PacketMotorSpeed.FORMAT)
+PacketMotorSpeed = namedtuple('PacketMotorSpeed', ['speed_left', 'speed_right']) # Motor speed packet structure
+PacketMotorSpeed.FORMAT = '!bb' # Binary data format: Network byte order, Speed (left motor) (1 byte), Speed (right motor) (1 byte)
+PacketMotorSpeed.SIZE = struct.calcsize(PacketMotorSpeed.FORMAT) # Calculates size of the above fields (2 bytes)
 
-PacketMotorSettings = namedtuple('PacketMotorSettings', ['stop_distance'])
-PacketMotorSettings.FORMAT = '!H'
-PacketMotorSettings.SIZE = struct.calcsize(PacketMotorSettings.FORMAT)
+PacketMotorSettings = namedtuple('PacketMotorSettings', ['stop_distance']) # Motor settings packet structure
+PacketMotorSettings.FORMAT = '!H' # Binary data format: Network byte order, Stop distance (2 bytes)
+PacketMotorSettings.SIZE = struct.calcsize(PacketMotorSettings.FORMAT) # Calculates size of the above fields (2 bytes)

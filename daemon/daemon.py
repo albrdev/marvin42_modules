@@ -138,7 +138,7 @@ class Daemon(object):
         Check if process ID actually exists/is running
         """
         try:
-            os.kill(pid, 0)
+            os.kill(pid, 0) # calling kill on pid with '0' doesn't affect the process (just fakes the behavior to get its status)
         except OSError as err:
             if err.errno == errno.ESRCH:
                 return False

@@ -163,11 +163,9 @@ class Daemon(object):
             else:
                 if status:
                     print("PID {0} is currently running".format(pid))
+                    sys.exit(1)
                 else:
-                    print("PID {0} is not running".format(pid))
                     self.del_pid()
-
-                sys.exit(1)
 
         self.init()
         self.loop()
@@ -193,9 +191,7 @@ class Daemon(object):
                 return
 
         try:
-            while True:
-                os.kill(pid, signal.SIGTERM)
-                time.sleep(0.1)
+            os.kill(pid, signal.SIGTERM)
         except OSError as err:
             if err.errno == errno.ESRCH:
                self.del_pid()

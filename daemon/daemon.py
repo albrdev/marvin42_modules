@@ -1,10 +1,15 @@
-# Daemon base class 
-#@author: albrdev
-#"""
+"""
+@author: albrdev
+@date: 2019-05-14
+"""
 
 import sys, os, time, errno, signal, atexit, argparse, configparser, pwd
 
 class Daemon(object):
+    """
+    Daemon base class
+    Derive from this class to daemonize your application
+    """
     __slots__ = ['__stdin_file', '__stderr_file', '__stdout_file', '__stderr_filepath', '__stdout_filepath', '__username', '__pid_file']
 
     def __init__(self, username, pid_file, stdout_filepath="/var/log/daemon.log", stderr_filepath="/var/log/daemon.log"):

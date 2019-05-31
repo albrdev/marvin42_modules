@@ -1,9 +1,14 @@
+"""
+@author: albrdev
+@date: 2019-05-14
+"""
+
 import socket, select, array, struct, queue, fcntl, termios
 from .packets import PacketHeader, PacketID
 
 class PacketReceiver(object):
     """
-    Base class for paket/data handling
+    Base class for packet/data handling
     Derive from this class to make custom packet handling easier
     """
     __slots__ = ['__socket', '__sockets_read', '__sockets_write', '__response_queues', '__header_buffer']

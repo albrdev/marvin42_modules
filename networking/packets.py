@@ -1,3 +1,8 @@
+"""
+@author: albrdev
+@date: 2019-05-14
+"""
+
 from enum import IntEnum
 from collections import namedtuple
 import struct
